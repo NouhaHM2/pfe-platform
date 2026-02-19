@@ -1,0 +1,33 @@
+name: Terraform CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform/envs/gcp-dev
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installer Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Vérification du format Terraform
+        run: terraform fmt -check -recursive
+
+      - name: Initialisation Terraform (sans backend cloud)
+        run: terraform init -input=false -backend=false
+
+      - name: Validation Terraform
+        run: terraform validate
